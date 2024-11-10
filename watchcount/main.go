@@ -3,16 +3,24 @@ package main
 import (
 	"context"
 	"fmt"
-	"golang.org/x/sync/errgroup"
 	"net/http"
+	"os"
+	"strconv"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/Khan/genqlient/graphql"
 	"github.com/google/uuid"
 )
 
-const maxConcurrency = 300 // 同時実行数
-
 func main() {
+	maxConcurrency, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		fmt.Println("You must provide a max concurrency as the first argument. e.g: watchcount 1000")
+		fmt.Println("Error parsing max concurrency: ", err)
+		return
+	}
+
 	ctx := context.Background()
 	url := "https://yuovision-api-tmp.yuorei.com/graphql"
 
