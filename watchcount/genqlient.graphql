@@ -1,0 +1,11 @@
+mutation incrementWatchCount($input: IncrementWatchCountInput!) {
+  IncrementWatchCount(input: $input) {
+    watchCount
+  }
+}
+
+query getVideos {
+  videos {
+    id
+  }
+}

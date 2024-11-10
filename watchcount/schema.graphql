@@ -1,0 +1,190 @@
+directive @auth on FIELD_DEFINITION
+
+"""
+The @defer directive may be specified on a fragment spread to imply
+de-prioritization, that causes the fragment to be omitted in the initial
+response, and delivered as a subsequent response afterward. A query with @defer
+directive will cause the request to potentially return multiple responses, where
+non-deferred data is delivered in the initial response and data deferred
+delivered in a subsequent response. @include and @skip take precedence over @defer.
+"""
+directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+"""
+The @specifiedBy built-in directive is used within the type system definition
+language to provide a scalar specification URL for specifying the behavior of
+custom scalar types.
+"""
+directive @specifiedBy(url: String!) on SCALAR
+
+type Ad implements Node {
+  id: ID!
+  title: String!
+  description: String
+  imageURL: String!
+  link: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Comment implements Node {
+  id: ID!
+  video: Video!
+  text: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+}
+
+input CutVideoInput {
+  VideoID: ID!
+  StartTime: Int!
+  EndTime: Int!
+}
+
+type CutVideoPayload {
+  cutVideoURL: String!
+}
+
+scalar DateTime
+
+input IncrementWatchCountInput {
+  VideoID: ID!
+  UserID: ID!
+}
+
+type IncrementWatchCountPayload {
+  watchCount: Int!
+}
+
+type Mutation {
+  registerUser(input: UserInput!): UserPayload!
+  subscribeChannel(input: subscribeChannelInput): SubscriptionPayload!
+  unSubscribeChannel(input: subscribeChannelInput): SubscriptionPayload!
+  postComment(input: PostCommentInput!): PostCommentPayload!
+  UploadVideo(input: UploadVideoInput!): VideoPayload!
+  IncrementWatchCount(input: IncrementWatchCountInput!): IncrementWatchCountPayload!
+}
+
+interface Node {
+  id: ID!
+}
+
+input PostCommentInput {
+  videoID: ID!
+  text: String!
+}
+
+type PostCommentPayload {
+  id: ID!
+  video: Video!
+  text: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type Query {
+  node(id: ID!): Node!
+  commentsByVideo(videoID: ID!): [Comment!]!
+  comment(id: ID!): Comment!
+  users: [User!]!
+  user(id: ID!): User!
+  userByAuth: User!
+  videos: [Video!]!
+  video(id: ID!): Video!
+  watchCount(videoID: ID!): Int!
+  cutVideo(input: CutVideoInput!): CutVideoPayload!
+}
+
+enum Role {
+  ADMIN
+  NORMAL
+  ADS
+}
+
+input subscribeChannelInput {
+  channelID: ID!
+}
+
+type SubscriptionPayload {
+  isSuccess: Boolean!
+}
+
+scalar Upload
+
+input UploadVideoInput {
+  video: Upload!
+  thumbnailImage: Upload
+  title: String!
+  description: String
+  tags: [String]
+  isPrivate: Boolean!
+  isAdult: Boolean!
+  isExternalCutout: Boolean!
+  isAds: Boolean!
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  profileImageURL: String!
+  isSubscribed: Boolean!
+  role: Role!
+  subscribechannelids: [ID!]!
+  videos: [Video!]!
+}
+
+input UserInput {
+  name: String!
+  isSubscribed: Boolean!
+  role: Role!
+}
+
+type UserPayload {
+  id: ID!
+  name: String!
+  profileImageURL: String!
+  isSubscribed: Boolean!
+  role: Role!
+  subscribechannelids: [ID!]!
+}
+
+type Video implements Node {
+  id: ID!
+  videoURL: String!
+  title: String!
+  thumbnailImageURL: String!
+  description: String
+  Tags: [String]
+  isPrivate: Boolean!
+  isAdult: Boolean!
+  isExternalCutout: Boolean!
+  isAd: Boolean!
+  watchCount: Int!
+  ads: [Ad]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  uploader: User!
+}
+
+type VideoPayload {
+  id: ID!
+  videoURL: String!
+  title: String!
+  thumbnailImageURL: String!
+  description: String
+  tags: [String]
+  isPrivate: Boolean!
+  isAdult: Boolean!
+  isExternalCutout: Boolean!
+  isAd: Boolean!
+  watchCount: Int!
+  ads: [Ad]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  uploader: User!
+}
+
